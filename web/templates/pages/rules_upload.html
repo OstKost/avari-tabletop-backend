@@ -1,0 +1,123 @@
+{{define "content"}}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 w-full">
+    <!-- Back Link -->
+    <a href="javascript:history.back()" class="inline-flex items-center gap-1.5 text-xs font-mono text-avari-text-muted hover:text-avari-gold mb-6 transition-colors group">
+        <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        <span>Назад к игре</span>
+    </a>
+
+    <!-- Main Card -->
+    <div class="bg-avari-surface/90 backdrop-blur-md rounded-3xl border border-avari-border shadow-elven-modal p-6 sm:p-8">
+        <!-- Header -->
+        <div class="flex items-start justify-between gap-4 mb-6 pb-5 border-b border-avari-borderSubtle">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="text-xl">📖</span>
+                    <h1 class="font-serif text-2xl font-bold text-avari-text-primary tracking-wide">
+                        База знаний правил
+                    </h1>
+                </div>
+                <p class="text-xs font-mono text-avari-text-muted">
+                    Загрузите текст официальных правил для RAG-индексации и ответов нейро-ассистента
+                </p>
+                <!-- English title for backward compatibility -->
+                <span class="sr-only">Правила игры / Game Rules</span>
+            </div>
+
+            <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-avari-elevated/70 border border-avari-borderSubtle text-xs font-mono text-avari-gold">
+                <span>RAG Semantic Search</span>
+            </div>
+        </div>
+
+        {{if .Error}}
+        <div class="mb-5 p-4 bg-avari-rose/10 border border-avari-rose/30 rounded-2xl text-xs sm:text-sm text-avari-rose flex items-center gap-3">
+            <span class="text-lg">⚠️</span>
+            <span>{{.Error}}</span>
+        </div>
+        {{end}}
+
+        {{if .Success}}
+        <div class="mb-5 p-4 bg-avari-emerald/10 border border-avari-emerald/30 rounded-2xl text-xs sm:text-sm text-avari-emerald flex items-center gap-3">
+            <span class="text-lg">✅</span>
+            <span>{{.Success}}</span>
+        </div>
+        {{end}}
+
+        {{if .IndexStatus}}<p class="mb-4 text-sm">Статус индексации: {{.IndexStatus}}. Сохранённый текст доступен независимо от статуса.</p>{{end}}
+        <form method="POST" action="/games/{{.GameID}}/rules" class="space-y-5">
+            <input type="hidden" name="revision" value="{{.Revision}}">
+            <input type="hidden" name="document_lang" value="{{.Lang}}">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Language Selector -->
+                <div>
+                    <label class="block text-[11px] font-mono tracking-wider text-avari-text-secondary uppercase mb-2">
+                        Язык правил / Language
+                    </label>
+                    <div class="relative">
+                        <select name="lang" onchange="location.href='/games/{{.GameID}}/rules?lang='+this.value"
+                                class="w-full appearance-none pl-4 pr-10 py-2.5 rounded-xl border border-avari-border bg-avari-input text-avari-text-primary text-sm focus:outline-none focus:border-avari-gold focus:ring-1 focus:ring-avari-gold transition-all cursor-pointer">
+                            <option value="ru" {{if eq .Lang "ru"}}selected{{end}}>Русский язык (ru)</option>
+                            <option value="en" {{if eq .Lang "en"}}selected{{end}}>English language (en)</option>
+                        </select>
+                        <svg class="w-4 h-4 text-avari-text-muted absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Source Field -->
+                <div>
+                    <label class="block text-[11px] font-mono tracking-wider text-avari-text-secondary uppercase mb-2">
+                        Источник / Source
+                    </label>
+                    <input type="text" name="source" value="{{.Source}}" placeholder="manual / official-pdf / bgg-wiki"
+                           class="w-full px-4 py-2.5 rounded-xl border border-avari-border bg-avari-input text-avari-text-primary placeholder-avari-text-muted text-sm focus:outline-none focus:border-avari-gold focus:ring-1 focus:ring-avari-gold transition-all">
+                </div>
+            </div>
+
+            <!-- Rules text editor -->
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <label class="block text-[11px] font-mono tracking-wider text-avari-text-secondary uppercase">
+                        Текст правил / Rules text
+                    </label>
+                    <span class="text-[10px] font-mono text-avari-text-muted">Markdown & Plain Text</span>
+                </div>
+                <div class="relative">
+                    <textarea name="content" rows="16" required
+                              placeholder="Вставьте официальный текст книги правил сюда..."
+                              class="w-full rounded-2xl border border-avari-border bg-avari-input px-4 py-3.5 text-xs sm:text-sm font-mono text-avari-text-primary placeholder-avari-text-muted focus:outline-none focus:border-avari-gold focus:ring-1 focus:ring-avari-gold transition-all resize-y leading-relaxed shadow-inner">{{.Content}}</textarea>
+                </div>
+                <p class="text-[11px] font-mono text-avari-text-muted mt-2 flex items-center gap-1.5">
+                    <span class="text-avari-gold">ℹ️</span>
+                    <span>Текст автоматически разбивается на смысловые фрагменты и индексируется для семантического поиска нейросетью.</span>
+                </p>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-col sm:flex-row gap-3 pt-3">
+                <button type="submit"
+                        class="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-avari-gold-light via-avari-gold to-avari-gold-dark text-avari-base text-xs font-semibold py-3 px-5 rounded-xl hover:shadow-gold-glow hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                    </svg>
+                    <span>Сохранить и проиндексировать</span>
+                </button>
+                
+                {{if .Content}}
+                <button type="button"
+                        hx-delete="/games/{{.GameID}}/rules?lang={{.Lang}}"
+                        hx-confirm="Удалить правила для этого языка?"
+                        {{if .Revision}}hx-headers='{ "If-Match": "\"v{{.Revision}}\"" }'{{end}}
+                        hx-push-url="false"
+                        class="px-5 py-3 text-xs font-mono text-avari-rose border border-avari-rose/30 bg-avari-rose/10 rounded-xl hover:bg-avari-rose/20 transition-all cursor-pointer">
+                    Удалить правила
+                </button>
+                {{end}}
+            </div>
+        </form>
+    </div>
+</div>
+{{end}}

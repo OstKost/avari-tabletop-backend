@@ -1,0 +1,177 @@
+{{define "collection_card"}}
+<div id="card-{{.Collection.GameID}}"
+     x-show="playerFilter === 0 || 
+             (playerFilter === 1 && {{deref .Game.MinPlayers}} <= 1) || 
+             (playerFilter === 2 && {{deref .Game.MinPlayers}} <= 2 && {{deref .Game.MaxPlayers}} >= 2) || 
+             (playerFilter === 4 && ({{deref .Game.MaxPlayers}} >= 3 && {{deref .Game.MinPlayers}} <= 4)) || 
+             (playerFilter === 5 && {{deref .Game.MaxPlayers}} >= 5)"
+     class="bg-avari-surface/90 backdrop-blur-md rounded-2xl border border-avari-border shadow-box-depth hover:border-avari-borderGold/50 transition-all duration-300 overflow-hidden flex flex-col justify-between group"
+     x-data="{ editing: false, status: '', rating: '', notes: '', error: '' }"
+     x-init="status = $refs.status.value; rating = $refs.rating.value; notes = $refs.notes.value"
+     @htmx:after-request.camel="if (!$event.detail.successful) { error = $event.detail.xhr.responseText; } else { error = ''; }">
+    
+    <p x-show="error" x-cloak x-text="error" role="alert" class="bg-avari-rose/15 border-b border-avari-rose/30 text-avari-rose text-xs px-4 py-2.5"></p>
+    
+    <div class="flex gap-4 p-4 items-start">
+        <!-- Box Thumbnail with Board Game Deluxe Look -->
+        <div class="flex-shrink-0 w-20 h-24 rounded-xl overflow-hidden bg-avari-base border border-avari-borderSubtle shadow-md relative group/box">
+            {{if .Game.ThumbnailURL}}
+            <img src="{{.Game.ThumbnailURL}}" alt="{{.Game.Name}}" class="w-full h-full object-cover group-hover/box:scale-105 transition-transform duration-300">
+            {{else}}
+            <div class="w-full h-full flex flex-col items-center justify-center text-3xl text-avari-gold/60 bg-gradient-to-b from-avari-elevated to-avari-base">
+                <span>🎲</span>
+            </div>
+            {{end}}
+            <!-- Game Box Shine overlay -->
+            <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none"></div>
+        </div>
+
+        <!-- Info -->
+        <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+                <a href="/games/{{.Game.BGGID}}"
+                   class="font-serif font-bold text-avari-text-primary hover:text-avari-gold-light transition-colors text-base leading-snug truncate block"
+                   title="{{.Game.Name}}">
+                    {{.Game.Name}}
+                </a>
+            </div>
+
+            <!-- Tabletop Metadata chips -->
+            <div class="flex flex-wrap items-center gap-1.5 mt-1.5 text-[11px] font-mono">
+                {{if and .Game.MinPlayers .Game.MaxPlayers}}
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-avari-elevated/80 border border-avari-borderSubtle text-avari-text-secondary">
+                    <span>👥</span>
+                    <span>
+                        {{if eq .Game.MinPlayers .Game.MaxPlayers}}
+                            {{.Game.MinPlayers}}
+                        {{else}}
+                            {{.Game.MinPlayers}}–{{.Game.MaxPlayers}}
+                        {{end}}
+                    </span>
+                </span>
+                {{end}}
+
+                {{if .Game.PlayingTime}}
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-avari-elevated/80 border border-avari-borderSubtle text-avari-text-secondary">
+                    <span>⏱</span>
+                    <span>~{{.Game.PlayingTime}}м</span>
+                </span>
+                {{end}}
+
+                {{if .Game.YearPublished}}
+                <span class="text-avari-text-muted">{{.Game.YearPublished}}</span>
+                {{end}}
+            </div>
+
+            <!-- Status badge -->
+            <div class="mt-2">
+                <span class="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-0.5 rounded-full font-mono border
+                    {{if eq .Collection.Status "owned"}}bg-avari-emerald/10 text-avari-emerald border-avari-emerald/30
+                    {{else if eq .Collection.Status "wishlist"}}bg-avari-gold/10 text-avari-gold border-avari-gold/30
+                    {{else}}bg-avari-cyan/10 text-avari-cyan border-avari-cyan/30{{end}}"
+                    x-text="{owned:'🏠 Owned', wishlist:'💭 Wishlist', played:'✅ Played'}[status]">
+                    {{if eq .Collection.Status "owned"}}🏠 Owned{{else if eq .Collection.Status "wishlist"}}💭 Wishlist{{else}}✅ Played{{end}}
+                </span>
+            </div>
+
+            <!-- Rating stars with gold hover effect -->
+            <div class="flex items-center gap-1 mt-2.5">
+                <div class="flex gap-0.5">
+                    {{range $i := seq 10}}
+                    <button type="button" @click="rating = {{$i}}; editing = true"
+                            class="text-sm transition-transform hover:scale-125 focus:outline-none"
+                            :class="{{$i}} <= rating ? 'text-avari-gold drop-shadow-[0_0_5px_rgba(229,179,84,0.6)]' : 'text-avari-border hover:text-avari-gold/40'"
+                            title="{{$i}}" aria-label="Rate {{$i}} out of 10">★</button>
+                    {{end}}
+                </div>
+                <span x-show="rating" x-text="rating + '/10'" class="text-[10px] font-mono text-avari-text-muted ml-1"></span>
+            </div>
+        </div>
+
+        <!-- Quick Tabletop Actions Column -->
+        <div class="flex flex-col gap-1.5 flex-shrink-0">
+            <a href="/chat/{{.Game.ID}}"
+               class="p-2 rounded-xl bg-avari-elevated/70 border border-avari-borderSubtle hover:border-avari-gold/60 text-avari-text-secondary hover:text-avari-gold hover:shadow-gold-sm transition-all"
+               title="Спросить Магистра Правил (AI Чат)">
+                <span class="text-sm">🤖</span>
+            </a>
+            <a href="/games/{{.Game.ID}}/rules"
+               class="p-2 rounded-xl bg-avari-elevated/70 border border-avari-borderSubtle hover:border-avari-gold/60 text-avari-text-secondary hover:text-avari-gold hover:shadow-gold-sm transition-all"
+               title="Открыть книгу правил">
+                <span class="text-sm">📖</span>
+            </a>
+            <button @click="editing = !editing"
+                    class="p-2 rounded-xl bg-avari-elevated/70 border border-avari-borderSubtle hover:border-avari-border text-avari-text-secondary hover:text-avari-text-primary transition-all cursor-pointer"
+                    title="Редактировать заметки и статус">
+                <span class="text-sm">✏️</span>
+            </button>
+            <button
+                hx-delete="/collection/{{.Collection.GameID}}"
+                hx-swap="none"
+                hx-confirm="Remove {{.Game.Name}} from your collection?"
+                class="p-2 rounded-xl bg-avari-elevated/70 border border-avari-borderSubtle hover:border-avari-rose/50 text-avari-text-secondary hover:text-avari-rose transition-all cursor-pointer"
+                title="Удалить с полки">
+                <span class="text-sm">🗑</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Notes Preview -->
+    {{if .Collection.Notes}}
+    <div x-show="!editing" class="px-4 pb-3 -mt-1">
+        <p class="text-xs text-avari-text-muted italic bg-avari-base/40 border border-avari-borderSubtle/60 rounded-xl px-3 py-1.5 line-clamp-2">
+            "{{.Collection.Notes}}"
+        </p>
+    </div>
+    {{end}}
+
+    <!-- Edit panel -->
+    <div x-show="editing" x-cloak x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         class="border-t border-avari-borderSubtle bg-avari-base/60 p-4">
+        <form hx-put="/collection/{{.Collection.GameID}}"
+              hx-swap="none">
+            <div class="flex flex-col gap-3">
+                <div>
+                    <label for="status-{{.Collection.GameID}}" class="text-[11px] font-mono tracking-wider text-avari-text-secondary uppercase mb-1 block">
+                        Статус
+                    </label>
+                    <select id="status-{{.Collection.GameID}}" name="status" x-ref="status" x-model="status"
+                            class="w-full text-xs border border-avari-border bg-avari-input text-avari-text-primary rounded-xl px-3 py-2 focus:outline-none focus:border-avari-gold focus:ring-1 focus:ring-avari-gold transition-all cursor-pointer">
+                        <option value="owned" {{if eq .Collection.Status "owned"}}selected{{end}}>🏠 Owned</option>
+                        <option value="wishlist" {{if eq .Collection.Status "wishlist"}}selected{{end}}>💭 Wishlist</option>
+                        <option value="played" {{if eq .Collection.Status "played"}}selected{{end}}>✅ Played</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="rating-{{.Collection.GameID}}" class="text-[11px] font-mono tracking-wider text-avari-text-secondary uppercase mb-1 block">
+                        Рейтинг (1–10, или оставьте пустым)
+                    </label>
+                    <input id="rating-{{.Collection.GameID}}" name="rating" type="number" min="1" max="10" step="1" x-ref="rating" x-model="rating" value="{{if .Collection.Rating}}{{deref .Collection.Rating}}{{end}}"
+                           class="w-full text-xs border border-avari-border bg-avari-input text-avari-text-primary rounded-xl px-3 py-2 focus:outline-none focus:border-avari-gold focus:ring-1 focus:ring-avari-gold transition-all"
+                           placeholder="1–10">
+                </div>
+                <div>
+                    <label for="notes-{{.Collection.GameID}}" class="text-[11px] font-mono tracking-wider text-avari-text-secondary uppercase mb-1 block">
+                        Заметки хранителя
+                    </label>
+                    <textarea id="notes-{{.Collection.GameID}}" name="notes" rows="2" x-ref="notes" x-model="notes"
+                              class="w-full text-xs border border-avari-border bg-avari-input text-avari-text-primary rounded-xl px-3 py-2 focus:outline-none focus:border-avari-gold focus:ring-1 focus:ring-avari-gold transition-all resize-none"
+                              placeholder="Заметки по партии, дополнениям, победителю...">{{.Collection.Notes}}</textarea>
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button type="submit"
+                            class="flex-1 bg-gradient-to-r from-avari-gold-light via-avari-gold to-avari-gold-dark text-avari-base text-xs font-semibold py-2 px-3 rounded-xl hover:shadow-gold-sm transition-all cursor-pointer">
+                        Сохранить
+                    </button>
+                    <button type="button" @click="editing = false"
+                            class="flex-1 border border-avari-border bg-avari-elevated text-avari-text-secondary hover:text-avari-text-primary text-xs font-medium py-2 px-3 rounded-xl hover:bg-avari-surface transition-all cursor-pointer">
+                        Отмена
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{{end}}

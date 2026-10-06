@@ -1,0 +1,5 @@
+defaultTabs:
+  - title: Server
+    command: make run
+  - title: Tests
+    command: make test

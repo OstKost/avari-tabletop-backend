@@ -1,0 +1,53 @@
+{{define "content"}}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 w-full">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6 pb-4 border-b border-avari-borderSubtle">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="text-xl">🔍</span>
+                <h1 class="text-xl sm:text-2xl font-serif font-bold text-avari-text-primary tracking-wide">
+                    Поиск по BoardGameGeek
+                </h1>
+                <span class="sr-only">Search games</span>
+            </div>
+            <p class="text-xs font-mono text-avari-text-muted">
+                Прямой доступ к мировой базе настольных игр: характеристики, рейтинги и правила
+            </p>
+        </div>
+        <a href="/collection" class="text-xs font-mono text-avari-gold hover:text-avari-gold-light underline flex items-center gap-1">
+            <span>← К коллекции</span>
+        </a>
+    </div>
+
+    <!-- Search input Card -->
+    <div class="bg-avari-surface/90 backdrop-blur-md rounded-2xl border border-avari-border p-4 mb-6 shadow-elven-card">
+        <label for="search-input" class="block text-[11px] font-mono tracking-wider text-avari-text-secondary uppercase mb-2">
+            Введите название игры (на английском или русском)
+        </label>
+        <div class="relative">
+            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-avari-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+            </svg>
+            <input id="search-input"
+                   type="search"
+                   name="q"
+                   value="{{.Query}}"
+                   placeholder="Например: Wingspan, Dune Imperium, Каркассон..."
+                   autofocus
+                   hx-get="/games/search"
+                   hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
+                   hx-target="#results"
+                   hx-indicator="#search-spinner"
+                   class="w-full pl-11 pr-12 py-3 rounded-xl border border-avari-border bg-avari-input text-avari-text-primary placeholder-avari-text-muted text-sm focus:outline-none focus:border-avari-gold focus:ring-1 focus:ring-avari-gold transition-all shadow-inner">
+            <div id="search-spinner" class="htmx-indicator absolute right-4 top-1/2 -translate-y-1/2 text-avari-gold text-sm animate-spin">
+                ⏳
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div id="results">
+        {{template "search_results" .}}
+    </div>
+</div>
+{{end}}

@@ -1,0 +1,32 @@
+name: Go and mobile API
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_DB: avari_b01_test
+          POSTGRES_PASSWORD: synthetic-ci-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d avari_b01_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      B01_TEST_DATABASE_URL: postgres://postgres:synthetic-ci-only@127.0.0.1:5432/avari_b01_test?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.1'
+      - run: go test -race ./... -count=1
+      - run: go vet ./...
+      - run: go build ./cmd/server ./cmd/seed

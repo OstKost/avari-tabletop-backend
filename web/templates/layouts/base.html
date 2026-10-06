@@ -1,0 +1,192 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="theme-color" content="#071117">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Avari Tabletop — Органайзер игр & Магистр правил</title>
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Philosopher:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        serif: ['Philosopher', 'Cinzel', 'Georgia', 'serif'],
+                        display: ['Cinzel', 'Philosopher', 'Georgia', 'serif'],
+                        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+                    },
+                    colors: {
+                        avari: {
+                            base: '#071117',
+                            surface: '#0B1B24',
+                            elevated: '#112633',
+                            input: '#0E212D',
+                            border: '#1B3747',
+                            borderSubtle: '#142B38',
+                            borderGold: 'rgba(229, 179, 84, 0.35)',
+                            text: {
+                                primary: '#F4F2EB',
+                                secondary: '#A9B7BC',
+                                muted: '#6F828B',
+                            },
+                            gold: {
+                                DEFAULT: '#E5B354',
+                                light: '#F5D17B',
+                                dark: '#B88528',
+                                glow: 'rgba(229, 179, 84, 0.22)',
+                            },
+                            emerald: '#4EBA6F',
+                            amber: '#EBA044',
+                            rose: '#E05D5D',
+                            cyan: '#60A5C8',
+                        },
+                        brand: {
+                            DEFAULT: '#E5B354',
+                            dark: '#B88528',
+                        }
+                    },
+                    boxShadow: {
+                        'gold-glow': '0 0 25px -4px rgba(229, 179, 84, 0.35)',
+                        'gold-sm': '0 0 14px -2px rgba(229, 179, 84, 0.28)',
+                        'box-depth': '0 18px 36px -10px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(27, 55, 71, 0.8)',
+                        'box-highlight': '0 0 0 2px #E5B354, 0 0 35px rgba(229, 179, 84, 0.45)',
+                        'elven-modal': '0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(229, 179, 84, 0.3)',
+                    },
+                    backgroundImage: {
+                        'tabletop-gradient': 'radial-gradient(circle at 50% 0%, rgba(17, 38, 51, 0.85) 0%, rgba(7, 17, 23, 0.98) 100%)',
+                        'gold-gradient': 'linear-gradient(135deg, #F5D17B 0%, #E5B354 50%, #B88528 100%)',
+                        'gold-subtle': 'linear-gradient(135deg, rgba(245, 209, 123, 0.16) 0%, rgba(229, 179, 84, 0.05) 100%)',
+                    },
+                    keyframes: {
+                        diceRoll: {
+                            '0%': { transform: 'rotate(0deg) scale(1)' },
+                            '25%': { transform: 'rotate(90deg) scale(1.2)' },
+                            '50%': { transform: 'rotate(180deg) scale(0.9)' },
+                            '75%': { transform: 'rotate(270deg) scale(1.15)' },
+                            '100%': { transform: 'rotate(360deg) scale(1)' },
+                        },
+                        spotlight: {
+                            '0%, 100%': { boxShadow: '0 0 0 2px #E5B354, 0 0 35px rgba(229, 179, 84, 0.5)' },
+                            '50%': { boxShadow: '0 0 0 1px #E5B354, 0 0 15px rgba(229, 179, 84, 0.25)' },
+                        }
+                    },
+                    animation: {
+                        'dice-roll': 'diceRoll 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                        'spotlight-pulse': 'spotlight 1.5s ease-in-out infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+    <!-- HTMX SSE extension -->
+    <script src="https://unpkg.com/htmx-ext-sse@2.2.2/sse.js"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+        body {
+            -webkit-tap-highlight-color: transparent;
+            background-color: #071117;
+            background-image: 
+                radial-gradient(circle at 50% -10%, rgba(26, 56, 73, 0.5) 0%, rgba(7, 17, 23, 0.98) 72%),
+                url('/static/background_main.png');
+            background-repeat: no-repeat;
+            background-position: center top;
+            background-attachment: fixed;
+            background-size: cover;
+            color: #F4F2EB;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        ::selection {
+            background-color: #E5B354;
+            color: #071117;
+        }
+
+        /* Tactile Tabletop Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #071117;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1B3747;
+            border-radius: 4px;
+            border: 1px solid rgba(229, 179, 84, 0.18);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #23485c;
+            border-color: rgba(229, 179, 84, 0.4);
+        }
+
+        .htmx-indicator { display: none; }
+        .htmx-request .htmx-indicator { display: inline-block; }
+        .htmx-request.htmx-indicator { display: inline-block; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-avari-gold selection:text-avari-base" hx-boost="true">
+
+{{template "nav" .}}
+
+<!-- Toast container -->
+<div id="toast-container" class="fixed top-5 right-5 z-50 space-y-2.5 w-84 max-w-[calc(100vw-2rem)]" aria-live="polite"></div>
+
+<main class="flex-1 flex flex-col">
+    {{block "content" .}}{{end}}
+</main>
+
+<!-- Top magical loading bar -->
+<div id="htmx-loading" class="fixed top-0 left-0 right-0 z-50 h-0.5 bg-gradient-to-r from-avari-gold-light via-avari-gold to-avari-gold-dark shadow-gold-sm opacity-0 transition-opacity duration-200"
+     hx-on:htmx:beforeRequest="this.style.opacity='1'"
+     hx-on:htmx:afterRequest="this.style.opacity='0'">
+</div>
+
+<script>
+    // Collection failures must remain visible even when HTMX keeps the current card.
+    document.body.addEventListener('htmx:responseError', function (event) {
+        const path = event.detail.requestConfig && event.detail.requestConfig.path;
+        if (!path || !/^\/collection(?:[/?]|$)/.test(path)) return;
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const notice = document.createElement('div');
+        notice.className = 'bg-avari-surface/95 border border-avari-rose/50 text-avari-text-primary rounded-2xl p-4 shadow-elven-modal text-sm backdrop-blur-md flex flex-col gap-2';
+        notice.setAttribute('role', 'alert');
+        const contentType = event.detail.xhr.getResponseHeader('Content-Type') || '';
+        const msg = document.createElement('div');
+        msg.className = 'flex items-start gap-2.5';
+        msg.innerHTML = `<span class="text-avari-rose">⚠️</span><span>${contentType.includes('text/plain') && event.detail.xhr.responseText ? event.detail.xhr.responseText : 'Не удалось обновить коллекцию. Пожалуйста, попробуйте снова.'}</span>`;
+        notice.appendChild(msg);
+
+        const dismiss = document.createElement('button');
+        dismiss.type = 'button';
+        dismiss.className = 'self-end text-xs text-avari-gold hover:text-avari-gold-light underline tracking-wide cursor-pointer';
+        dismiss.textContent = 'Закрыть';
+        dismiss.addEventListener('click', function () { notice.remove(); });
+        notice.appendChild(dismiss);
+        container.replaceChildren(notice);
+    });
+</script>
+
+</body>
+</html>
+{{end}}

@@ -1,0 +1,266 @@
+{{define "content"}}
+<div class="flex flex-col h-[calc(100vh-4rem)] bg-avari-base/90 relative">
+    
+    <!-- Tabletop Chat Topbar -->
+    <div class="bg-avari-surface/95 backdrop-blur-md border-b border-avari-border px-4 py-3 flex items-center gap-3.5 shadow-box-depth z-20">
+        <a href="/collection" class="p-2 rounded-xl text-avari-text-muted hover:text-avari-gold hover:bg-avari-elevated transition-colors" title="Назад к полке игр">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+        </a>
+        
+        <div class="w-10 h-10 rounded-xl overflow-hidden bg-avari-elevated border border-avari-borderSubtle flex-shrink-0 shadow-inner">
+            {{if .Game.ThumbnailURL}}
+            <img src="{{.Game.ThumbnailURL}}" alt="" class="w-full h-full object-cover">
+            {{else}}
+            <div class="w-full h-full flex items-center justify-center text-lg text-avari-gold">🎲</div>
+            {{end}}
+        </div>
+        
+        <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+                <h1 class="font-serif font-bold text-avari-text-primary text-sm sm:text-base truncate">{{.Game.Name}}</h1>
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-avari-gold/15 text-avari-gold border border-avari-gold/30">
+                    <span class="w-1.5 h-1.5 rounded-full bg-avari-emerald animate-pulse"></span>
+                    Магистр Правил
+                </span>
+            </div>
+            <p class="text-[11px] font-mono text-avari-text-muted">Нейро-арбитр споров & семантический поиск RAG</p>
+        </div>
+
+        <div class="flex items-center gap-1.5">
+            <a href="/games/{{.Game.ID}}/rules"
+               class="p-2 rounded-xl bg-avari-elevated/70 border border-avari-borderSubtle text-avari-text-secondary hover:text-avari-gold hover:border-avari-gold/40 transition-all text-xs flex items-center gap-1.5"
+               title="Книга правил">
+                <span>📖</span>
+                <span class="hidden sm:inline font-mono">Книга правил</span>
+            </a>
+            <button
+                hx-delete="/chat/{{.Game.ID}}/history"
+                hx-target="#messages"
+                hx-swap="outerHTML"
+                hx-confirm="Clear chat history?"
+                class="p-2 rounded-xl bg-avari-elevated/70 border border-avari-borderSubtle text-avari-text-secondary hover:text-avari-rose hover:border-avari-rose/40 transition-all text-xs"
+                title="Очистить историю диалога">
+                🗑
+            </button>
+        </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div id="messages" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+        {{if not .Messages}}
+        <div class="max-w-xl mx-auto text-center py-10 px-4">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-avari-surface border border-avari-borderGold/50 shadow-gold-sm flex items-center justify-center text-3xl">
+                📜
+            </div>
+            <h2 class="font-serif text-xl sm:text-2xl font-bold text-avari-text-primary mb-2">
+                Задайте вопрос Магистру по игре {{.Game.Name}}
+            </h2>
+            <p class="text-xs sm:text-sm text-avari-text-muted mb-8 leading-relaxed">
+                Rules, strategy, how to set up the game... Возник спор во время партии? Не понятен эффект карты или фаза хода? Спросите прямо сейчас:
+            </p>
+
+            <!-- Quick Tabletop Situation Chips -->
+            <div class="flex flex-wrap justify-center gap-2 text-left" x-data>
+                <button type="button"
+                        @click="document.getElementById('message-input').value = 'Как подготовить стартовое поле и раздать компоненты (Setup)?'; document.getElementById('message-input').dispatchEvent(new Event('input'))"
+                        class="px-3.5 py-2 rounded-xl bg-avari-surface/90 border border-avari-border hover:border-avari-gold/60 text-xs text-avari-text-secondary hover:text-avari-gold transition-all shadow-sm cursor-pointer flex items-center gap-1.5">
+                    <span>📋</span>
+                    <span>Стартовый сетап и раскладка</span>
+                </button>
+                <button type="button"
+                        @click="document.getElementById('message-input').value = 'Возник спор за столом: объясни порядок хода и какие действия разрешены в активную фазу.'; document.getElementById('message-input').dispatchEvent(new Event('input'))"
+                        class="px-3.5 py-2 rounded-xl bg-avari-surface/90 border border-avari-border hover:border-avari-gold/60 text-xs text-avari-text-secondary hover:text-avari-gold transition-all shadow-sm cursor-pointer flex items-center gap-1.5">
+                    <span>⚔️</span>
+                    <span>Разрешить спор о структуре хода</span>
+                </button>
+                <button type="button"
+                        @click="document.getElementById('message-input').value = 'Когда наступает триггер конца партии и как точно подсчитываются победные очки?'; document.getElementById('message-input').dispatchEvent(new Event('input'))"
+                        class="px-3.5 py-2 rounded-xl bg-avari-surface/90 border border-avari-border hover:border-avari-gold/60 text-xs text-avari-text-secondary hover:text-avari-gold transition-all shadow-sm cursor-pointer flex items-center gap-1.5">
+                    <span>🏆</span>
+                    <span>Конец игры и подсчёт очков</span>
+                </button>
+            </div>
+        </div>
+        {{else}}
+        {{range .Messages}}
+        {{if eq .Role "user"}}
+        <div class="flex gap-3 justify-end items-start">
+            <div class="bg-avari-elevated/90 border border-avari-borderGold/40 text-avari-text-primary rounded-2xl rounded-tr-none px-4 py-3 shadow-box-depth max-w-sm sm:max-w-md md:max-w-xl text-xs sm:text-sm whitespace-pre-wrap leading-relaxed">
+                {{.Content}}
+            </div>
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-r from-avari-gold-light to-avari-gold text-avari-base flex items-center justify-center text-xs font-bold flex-shrink-0 shadow-gold-sm">
+                👤
+            </div>
+        </div>
+        {{else}}
+        <div class="flex gap-3 items-start">
+            <div class="w-8 h-8 rounded-xl bg-avari-surface border border-avari-borderGold/50 text-avari-gold flex items-center justify-center text-sm flex-shrink-0 shadow-gold-sm">
+                📜
+            </div>
+            <div class="bg-avari-surface/95 border border-avari-border text-avari-text-primary rounded-2xl rounded-tl-none px-4 py-3 shadow-box-depth max-w-sm sm:max-w-md md:max-w-xl text-xs sm:text-sm whitespace-pre-wrap leading-relaxed">
+                {{.Content}}
+            </div>
+        </div>
+        {{end}}
+        {{end}}
+        {{end}}
+
+        <!-- Streaming output appended here -->
+        <div id="stream-output"></div>
+    </div>
+
+    <!-- Input Bar -->
+    <div class="bg-avari-surface/95 backdrop-blur-md border-t border-avari-border p-4 shadow-elven-modal z-20">
+        <div class="max-w-4xl mx-auto">
+            <form id="chat-form"
+                  x-data="chatForm()"
+                  @submit.prevent="sendMessage"
+                  class="flex gap-2.5 items-end">
+                <textarea
+                    id="message-input"
+                    name="message"
+                    x-model="message"
+                    @keydown.enter.exact.prevent="sendMessage"
+                    @keydown.enter.shift.exact="/* allow newline */"
+                    @input="autoResize($el)"
+                    placeholder="Спросите Магистра о правилах, эффектах карт или спорных ситуациях..."
+                    rows="1"
+                    :disabled="sending"
+                    class="flex-1 resize-none rounded-xl border border-avari-border bg-avari-input px-4 py-3 text-xs sm:text-sm text-avari-text-primary placeholder-avari-text-muted focus:outline-none focus:border-avari-gold focus:ring-1 focus:ring-avari-gold transition-all max-h-32 overflow-y-auto disabled:opacity-50 shadow-inner"></textarea>
+                <button type="submit"
+                        :disabled="!message.trim() || sending"
+                        :class="message.trim() && !sending ? 'bg-gradient-to-r from-avari-gold-light via-avari-gold to-avari-gold-dark text-avari-base hover:shadow-gold-glow cursor-pointer' : 'bg-avari-elevated border border-avari-border text-avari-text-muted cursor-not-allowed opacity-50'"
+                        class="w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 shadow-sm"
+                        title="Отправить вопрос Магистру">
+                    <svg x-show="!sending" class="w-4 h-4 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                    </svg>
+                    <svg x-show="sending" x-cloak class="w-4 h-4 animate-spin text-avari-gold" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function chatForm() {
+    return {
+        message: '',
+        sending: false,
+        gameID: '{{.Game.ID}}',
+
+        clientRequestID: '{{.ClientRequestID}}',
+        idempotencyKey: '{{.IdempotencyKey}}',
+        pendingMessage: null,
+
+        async sendMessage() {
+            if (this.sending) return;
+            const msg = this.pendingMessage ?? this.message;
+            if (!msg.trim()) return;
+            this.clientRequestID ||= crypto.randomUUID();
+            this.idempotencyKey ||= crypto.randomUUID();
+            const messagesDiv = document.getElementById('messages');
+            const streamOutput = document.getElementById('stream-output');
+            if (this.pendingMessage === null) {
+                this.pendingMessage = msg;
+                this.message = '';
+                const userEl = document.createElement('div');
+                userEl.className = 'flex justify-end p-3 whitespace-pre-wrap';
+                userEl.textContent = msg;
+                messagesDiv.insertBefore(userEl, streamOutput);
+            }
+            this.sending = true;
+            const outputID = 'assistant-' + this.clientRequestID;
+            document.getElementById(outputID)?.remove();
+            const assistantEl = document.createElement('div');
+            assistantEl.id = outputID;
+            assistantEl.className = 'p-3 whitespace-pre-wrap text-avari-text-primary';
+            assistantEl.textContent = 'Магистр изучает правила…';
+            messagesDiv.insertBefore(assistantEl, streamOutput);
+            let text = '';
+            let terminal = false;
+            try {
+                const resp = await fetch(`/chat/${this.gameID}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ message: msg, client_request_id: this.clientRequestID,
+                                               idempotency_key: this.idempotencyKey }).toString()
+                });
+                if (resp.redirected) { location.href = resp.url; return; }
+                if (!resp.ok || !resp.headers.get('Content-Type')?.startsWith('text/event-stream')) throw new Error('Request failed');
+                const reader = resp.body.getReader();
+                const decoder = new TextDecoder('utf-8', { fatal: true });
+                let buffer = '';
+                function consume(frame) {
+                    let kind = 'message';
+                    const data = [];
+                    for (const line of frame.split('\n')) {
+                        if (line.startsWith('event:')) kind = line.slice(6).trim();
+                        if (line.startsWith('data:')) data.push(line.slice(5).replace(/^ /, ''));
+                    }
+                    if (!data.length) return;
+                    if (!['delta','completed','failed','cancelled'].includes(kind)) return;
+                    const value = JSON.parse(data.join('\n'));
+                    if (kind === 'delta') { text += value.text; assistantEl.textContent = text; }
+                    if (kind === 'completed') { assistantEl.textContent = value.result.text; terminal = true; }
+                    if (kind === 'failed' || kind === 'cancelled') {
+                        assistantEl.textContent = kind === 'cancelled' ? 'Запрос отменён.' : 'Не удалось получить ответ. Можно задать вопрос заново.';
+                        terminal = true;
+                    }
+                }
+                while (true) {
+                    const { done, value } = await reader.read();
+                    buffer += done ? decoder.decode() : decoder.decode(value, { stream: true });
+                    buffer = buffer.replace(/\r\n/g, '\n');
+                    if (buffer.length > 2 * 1024 * 1024) throw new Error('Frame limit');
+                    let boundary;
+                    while ((boundary = buffer.indexOf('\n\n')) !== -1) {
+                        consume(buffer.slice(0, boundary));
+                        buffer = buffer.slice(boundary + 2);
+                        this.scrollToBottom();
+                    }
+                    if (terminal) { await reader.cancel(); break; }
+                    if (done) break;
+                }
+                if (!terminal) throw new Error('Unconfirmed end of stream');
+                this.pendingMessage = null;
+                this.clientRequestID = crypto.randomUUID();
+                this.idempotencyKey = crypto.randomUUID();
+            } catch (e) {
+                const notice = document.createElement('p');
+                notice.className = 'text-avari-rose text-xs p-3';
+                notice.textContent = 'Связь прервана. Повторная отправка восстановит тот же запрос; для завершённых ответов можно обновить страницу.';
+                messagesDiv.insertBefore(notice, streamOutput);
+            } finally {
+                this.sending = false;
+                this.scrollToBottom();
+            }
+        },
+
+        scrollToBottom() {
+            const m = document.getElementById('messages');
+            if (m) m.scrollTop = m.scrollHeight;
+        },
+
+        autoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 128) + 'px';
+        },
+
+        escapeHTML(s) {
+            return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const m = document.getElementById('messages');
+    if (m) m.scrollTop = m.scrollHeight;
+});
+</script>
+{{end}}

@@ -1,0 +1,92 @@
+{{define "content"}}
+<div class="relative overflow-hidden min-h-[calc(100vh-4rem)] flex flex-col justify-between">
+    <!-- Atmospheric Tabletop Glows -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[380px] bg-avari-gold/5 blur-[130px] rounded-full pointer-events-none"></div>
+    <div class="absolute top-12 left-12 w-80 h-80 bg-cyan-900/15 blur-[120px] rounded-full pointer-events-none"></div>
+
+    <div class="max-w-5xl mx-auto px-4 py-12 sm:py-16 flex flex-col items-center text-center relative z-10 my-auto">
+        <!-- Tabletop Sigil Badge -->
+        <div class="mb-6 relative group">
+            <div class="absolute -inset-3 bg-gradient-to-r from-avari-gold/25 via-avari-emerald/15 to-avari-gold/25 rounded-3xl blur-lg opacity-80 group-hover:opacity-100 transition duration-500"></div>
+            <div class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-avari-surface/90 border border-avari-borderGold/60 p-4 shadow-box-depth flex items-center justify-center backdrop-blur-md">
+                <img src="/static/logo.svg" alt="Avari Tabletop Sigil" class="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(229,179,84,0.5)]">
+            </div>
+        </div>
+
+        <!-- Tagline Pill -->
+        <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-avari-elevated/90 border border-avari-borderGold/40 text-xs font-mono text-avari-gold mb-6 shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-avari-gold shadow-[0_0_8px_rgba(229,179,84,0.8)] animate-pulse"></span>
+            <span>Святилище настольных партий & Магистр правил</span>
+        </div>
+
+        <!-- Main Title -->
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold text-avari-text-primary tracking-wide leading-tight mb-4">
+            Твоя игровая полка.<br>
+            <span class="bg-gradient-to-r from-avari-gold-light via-avari-gold to-avari-gold-dark bg-clip-text text-transparent">
+                Твой арбитр правил.
+            </span>
+        </h1>
+
+        <p class="text-avari-text-secondary text-base sm:text-lg mb-10 max-w-2xl font-normal leading-relaxed">
+            Управляйте личной коллекцией настолок, мгновенно находите игры в глобальной базе BoardGameGeek и бросайте «Кубик Судьбы», когда не можете решить, во что сыграть сегодня вечером.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 w-full max-w-md justify-center mb-16">
+            <a href="/collection"
+               class="flex-1 inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-avari-gold-light via-avari-gold to-avari-gold-dark text-avari-base px-6 py-3.5 rounded-xl font-semibold hover:shadow-gold-glow hover:scale-[1.02] active:scale-[0.99] transition-all duration-200 text-sm">
+                <span class="text-base">🎲</span>
+                <span>Открыть полку игр</span>
+            </a>
+            <a href="/games/search"
+               class="flex-1 inline-flex items-center justify-center gap-2 bg-avari-surface/90 hover:bg-avari-elevated text-avari-text-primary border border-avari-border hover:border-avari-borderGold/60 px-6 py-3.5 rounded-xl font-semibold transition-all duration-200 text-sm shadow-box-depth">
+                <span>🔍 Поиск BGG</span>
+            </a>
+        </div>
+
+        <!-- Feature Cards with Real Board Gamer Focus -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 w-full text-left">
+            <div class="bg-avari-surface/90 backdrop-blur-md rounded-2xl p-6 border border-avari-border shadow-box-depth hover:border-avari-gold/50 transition-all duration-300 group">
+                <div class="w-12 h-12 rounded-xl bg-avari-elevated border border-avari-borderSubtle flex items-center justify-center text-2xl mb-4 group-hover:border-avari-gold/50 group-hover:shadow-gold-sm transition-all">
+                    🎲
+                </div>
+                <h3 class="font-serif text-lg font-bold text-avari-text-primary mb-2 group-hover:text-avari-gold-light transition-colors">
+                    Полка & «Кубик Судьбы»
+                </h3>
+                <p class="text-xs sm:text-sm text-avari-text-muted leading-relaxed">
+                    Учёт коробок, вишлист и сыгранные партии. Фирменный жребий «Во что сыграть?» с фильтром по составу игроков решит проблему долгого выбора за столом.
+                </p>
+            </div>
+
+            <div class="bg-avari-surface/90 backdrop-blur-md rounded-2xl p-6 border border-avari-border shadow-box-depth hover:border-avari-gold/50 transition-all duration-300 group">
+                <div class="w-12 h-12 rounded-xl bg-avari-elevated border border-avari-borderSubtle flex items-center justify-center text-2xl mb-4 group-hover:border-avari-gold/50 group-hover:shadow-gold-sm transition-all">
+                    🌐
+                </div>
+                <h3 class="font-serif text-lg font-bold text-avari-text-primary mb-2 group-hover:text-avari-gold-light transition-colors">
+                    Каталог 140,000+ игр
+                </h3>
+                <p class="text-xs sm:text-sm text-avari-text-muted leading-relaxed">
+                    Быстрый доступ к всемирной базе BoardGameGeek: оригинальные обложки, точное число игроков, длительность партии и мировой рейтинг гиков.
+                </p>
+            </div>
+
+            <div class="bg-avari-surface/90 backdrop-blur-md rounded-2xl p-6 border border-avari-border shadow-box-depth hover:border-avari-gold/50 transition-all duration-300 group">
+                <div class="w-12 h-12 rounded-xl bg-avari-elevated border border-avari-borderSubtle flex items-center justify-center text-2xl mb-4 group-hover:border-avari-gold/50 group-hover:shadow-gold-sm transition-all">
+                    📜
+                </div>
+                <h3 class="font-serif text-lg font-bold text-avari-text-primary mb-2 group-hover:text-avari-gold-light transition-colors">
+                    Магистр Правил (RAG AI)
+                </h3>
+                <p class="text-xs sm:text-sm text-avari-text-muted leading-relaxed">
+                    Хватит листать 40 страниц буклета во время партии! Загрузите правила, и AI-арбитр за пару секунд ответит на спорный вопрос по нюансам сетапа или фаз хода.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subdued Footer -->
+    <div class="border-t border-avari-borderSubtle/60 py-6 text-center text-xs font-mono text-avari-text-muted">
+        <span>Avari Tabletop &copy; 2026 &middot; Для любителей настольных игр и фэнтези</span>
+    </div>
+</div>
+{{end}}

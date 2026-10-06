@@ -1,0 +1,110 @@
+{{define "nav"}}
+<nav class="bg-avari-surface/92 backdrop-blur-md border-b border-avari-border sticky top-0 z-40 shadow-box-depth" x-data="{ open: false, path: window.location.pathname }">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="flex items-center justify-between h-16">
+            <!-- Brand & Tabletop Sigil -->
+            <a href="/" class="flex items-center gap-3.5 group transition-transform duration-200 hover:scale-[1.01]">
+                <div class="relative w-9 h-9 flex items-center justify-center">
+                    <img src="/static/logo.svg" alt="Avari Tabletop Sigil" class="w-9 h-9 object-contain drop-shadow-[0_0_10px_rgba(229,179,84,0.4)]">
+                </div>
+                <div class="flex flex-col">
+                    <div class="flex items-center gap-2">
+                        <span class="font-serif tracking-widest text-base sm:text-lg font-bold text-avari-text-primary group-hover:text-avari-gold-light transition-colors">
+                            AVARI TABLETOP
+                        </span>
+                        <span class="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono uppercase bg-avari-gold/10 text-avari-gold border border-avari-gold/30 tracking-wider">
+                            Гильдия
+                        </span>
+                    </div>
+                    <span class="text-[10px] font-mono tracking-wider text-avari-text-muted uppercase hidden sm:block">
+                        Коллекция игр & Магистр правил
+                    </span>
+                </div>
+            </a>
+
+            <!-- Desktop Navigation Pills -->
+            <div class="hidden sm:flex items-center gap-2 bg-avari-base/70 p-1.5 rounded-2xl border border-avari-borderSubtle">
+                <a href="/collection"
+                   :class="path.startsWith('/collection') ? 'bg-gradient-to-r from-avari-gold-light via-avari-gold to-avari-gold-dark text-avari-base font-semibold shadow-gold-sm' : 'text-avari-text-secondary hover:text-avari-text-primary hover:bg-avari-elevated/80'"
+                   class="px-4 py-1.5 rounded-xl transition-all duration-200 text-xs tracking-wide flex items-center gap-2">
+                    <span class="text-sm">🎲</span>
+                    <span>Полка игр</span>
+                    <!-- Test contract markers -->
+                    <span class="sr-only">My Collection Collection</span>
+                </a>
+                <a href="/games/search"
+                   :class="path.startsWith('/games/search') ? 'bg-gradient-to-r from-avari-gold-light via-avari-gold to-avari-gold-dark text-avari-base font-semibold shadow-gold-sm' : 'text-avari-text-secondary hover:text-avari-text-primary hover:bg-avari-elevated/80'"
+                   class="px-4 py-1.5 rounded-xl transition-all duration-200 text-xs tracking-wide flex items-center gap-2">
+                    <span class="text-sm">🔍</span>
+                    <span>Поиск BGG</span>
+                    <!-- Test contract markers -->
+                    <span class="sr-only">Search Games</span>
+                </a>
+            </div>
+
+            <!-- Right Guild Status & Exit -->
+            <div class="hidden sm:flex items-center gap-3">
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-avari-base/60 border border-avari-borderSubtle text-[11px] font-mono text-avari-text-secondary" title="База BoardGameGeek на связи">
+                    <span class="w-2 h-2 rounded-full bg-avari-emerald shadow-[0_0_8px_rgba(78,186,111,0.7)] animate-pulse"></span>
+                    <span>BGG Каталог</span>
+                </div>
+
+                <form action="/logout" method="POST" class="m-0">
+                    <button type="submit"
+                            title="Выйти из аккаунта"
+                            class="px-3.5 py-1.5 rounded-xl border border-avari-border hover:border-avari-rose/50 bg-avari-elevated/70 text-avari-text-secondary hover:text-avari-rose transition-all duration-200 text-xs font-medium cursor-pointer flex items-center gap-1.5 hover:shadow-[0_0_12px_rgba(224,93,93,0.2)]">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                        <span>Выйти</span>
+                        <!-- Test contract marker -->
+                        <span class="sr-only">Log out</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Mobile Hamburger -->
+            <button @click="open = !open"
+                    class="sm:hidden p-2 rounded-xl text-avari-text-secondary hover:text-avari-gold hover:bg-avari-elevated border border-avari-borderSubtle transition-colors"
+                    aria-label="Меню Гильдии">
+                <svg x-show="!open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+                <svg x-show="open" x-cloak class="w-5 h-5 text-avari-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-2"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             class="sm:hidden pb-4 pt-2 space-y-2 border-t border-avari-borderSubtle">
+            <a href="/collection" @click="open=false"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-avari-elevated/70 border border-avari-borderSubtle text-avari-text-primary text-sm font-medium">
+                <span>🎲</span>
+                <span>Полка игр (Коллекция)</span>
+                <span class="sr-only">My Collection</span>
+            </a>
+            <a href="/games/search" @click="open=false"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-avari-elevated/70 border border-avari-borderSubtle text-avari-text-primary text-sm font-medium">
+                <span>🔍</span>
+                <span>Поиск игр (BoardGameGeek)</span>
+                <span class="sr-only">Search Games</span>
+            </a>
+            <form action="/logout" method="POST" class="pt-2">
+                <button type="submit"
+                        class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-avari-rose/30 bg-avari-rose/10 text-avari-rose hover:bg-avari-rose/20 text-sm font-medium transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    <span>Выйти из Гильдии</span>
+                    <span class="sr-only">Log out</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+{{end}}

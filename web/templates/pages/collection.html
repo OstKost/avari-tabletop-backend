@@ -1,0 +1,106 @@
+{{define "content"}}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 w-full"
+     x-data="collectionShelf()"
+     @dice-picked.window="highlightPickedGame($event.detail.gameId, $event.detail.gameName)">
+    
+    <!-- Header Section with Tabletop Branding and Fate Dice -->
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 pb-5 border-b border-avari-borderSubtle">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="text-2xl">🎲</span>
+                <h1 class="text-xl sm:text-2xl font-serif font-bold text-avari-text-primary tracking-wide">
+                    Полка настольных игр
+                </h1>
+                <!-- Test compatibility marker -->
+                <span class="sr-only">My Collection</span>
+            </div>
+            <p class="text-xs font-mono text-avari-text-muted">
+                Ваша персональная игротека: учёт партий, вишлист и мгновенный доступ к правилам
+            </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+            <!-- Signature Tabletop Feature: Fate Dice / Random Game Picker -->
+            <button type="button"
+                    @click="rollFateDice()"
+                    :disabled="rolling"
+                    class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-avari-elevated/90 hover:bg-avari-surface border border-avari-borderGold/60 hover:border-avari-gold text-avari-gold hover:text-avari-gold-light text-xs font-semibold px-4 py-2.5 rounded-xl shadow-gold-sm transition-all duration-200 cursor-pointer active:scale-95 group">
+                <span class="text-base group-hover:scale-110 transition-transform" :class="rolling ? 'animate-dice-roll' : ''">🎲</span>
+                <span x-text="rolling ? 'Бросаем кубик...' : 'Во что сыграть?'">Во что сыграть?</span>
+            </button>
+
+            <!-- Add Game Action -->
+            <a href="/games/search"
+               class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-gradient-to-r from-avari-gold-light via-avari-gold to-avari-gold-dark text-avari-base text-xs font-semibold px-4 py-2.5 rounded-xl hover:shadow-gold-glow hover:scale-[1.02] active:scale-[0.99] transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                </svg>
+                <span>+ Добавить игру</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Fate Dice Banner Result (When Picked) -->
+    <div x-show="chosenGameName" x-cloak x-transition
+         class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-avari-gold/15 via-avari-surface to-avari-gold/10 border border-avari-borderGold shadow-gold-glow flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-r from-avari-gold-light to-avari-gold text-avari-base flex items-center justify-center text-xl font-bold shadow-gold-sm flex-shrink-0">
+                🎯
+            </div>
+            <div>
+                <span class="block text-[10px] font-mono text-avari-gold uppercase tracking-widest">Жребий Гильдии брошен</span>
+                <span class="text-sm sm:text-base font-serif font-bold text-avari-text-primary">
+                    Сегодня на столе: <span class="text-avari-gold-light" x-text="chosenGameName"></span>!
+                </span>
+            </div>
+        </div>
+        <button type="button" @click="chosenGameName = ''" class="text-avari-text-muted hover:text-avari-text-primary text-xs px-2 py-1">
+            ✕
+        </button>
+    </div>
+
+    <!-- Collection List Partial -->
+    {{template "collection_list" .}}
+</div>
+
+<script>
+function collectionShelf() {
+    return {
+        rolling: false,
+        chosenGameName: '',
+
+        rollFateDice() {
+            const cards = Array.from(document.querySelectorAll('#game-list [id^="card-"]'));
+            if (!cards.length) {
+                alert('Сначала добавьте игры на вашу полку!');
+                return;
+            }
+
+            this.rolling = true;
+            this.chosenGameName = '';
+
+            // Remove any previous spotlight
+            document.querySelectorAll('.animate-spotlight-pulse').forEach(el => {
+                el.classList.remove('animate-spotlight-pulse', 'shadow-box-highlight');
+            });
+
+            setTimeout(() => {
+                const randomCard = cards[Math.floor(Math.random() * cards.length)];
+                const gameName = randomCard.querySelector('a[title]')?.getAttribute('title') || 'Выбранная игра';
+                this.rolling = false;
+                this.chosenGameName = gameName;
+
+                // Add spotlight highlight effect
+                randomCard.classList.add('animate-spotlight-pulse', 'shadow-box-highlight');
+                randomCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Dispatch event
+                window.dispatchEvent(new CustomEvent('dice-picked', {
+                    detail: { gameId: randomCard.id, gameName: gameName }
+                }));
+            }, 650);
+        }
+    }
+}
+</script>
+{{end}}

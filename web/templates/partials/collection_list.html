@@ -1,0 +1,135 @@
+{{define "collection_list"}}
+<div id="collection-content" hx-get="{{.CurrentURL}}" hx-trigger="collectionChanged from:body" hx-target="this" hx-swap="outerHTML"
+     hx-on::before-swap="if (event.detail.requestConfig.verb === 'get' &amp;&amp; (event.detail.xhr.status === 400 || event.detail.xhr.status === 500)) { event.detail.shouldSwap = true; event.detail.isError = false; }"
+     x-data="{ playerFilter: 0 }">
+    
+    <!-- Filter and Search Bar Card -->
+    <div class="bg-avari-surface/90 backdrop-blur-md rounded-2xl border border-avari-border p-4 mb-4 shadow-box-depth">
+        <form action="/collection" method="get" hx-get="/collection" hx-target="#collection-content" hx-swap="outerHTML" hx-push-url="true" class="flex flex-col sm:flex-row items-stretch sm:items-end gap-3">
+            <input type="hidden" name="status" value="{{.FilterStatus}}">
+            
+            <!-- Search input -->
+            <div class="flex-1">
+                <label for="collection-query" class="block text-[11px] font-mono tracking-wider text-avari-text-secondary uppercase mb-1.5">
+                    Поиск по названию
+                </label>
+                <div class="relative">
+                    <input id="collection-query" type="search" name="q" value="{{.Query}}" placeholder="Поиск по названию..."
+                           class="w-full pl-9 pr-4 py-2 rounded-xl border border-avari-border bg-avari-input text-avari-text-primary placeholder-avari-text-muted text-sm focus:outline-none focus:border-avari-gold focus:ring-1 focus:ring-avari-gold transition-all">
+                    <svg class="w-4 h-4 text-avari-text-muted absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Sort dropdown -->
+            <div class="w-full sm:w-48">
+                <label for="collection-sort" class="block text-[11px] font-mono tracking-wider text-avari-text-secondary uppercase mb-1.5">
+                    Сортировка
+                </label>
+                <div class="relative">
+                    <select id="collection-sort" name="sort"
+                            class="w-full appearance-none pl-3 pr-8 py-2 rounded-xl border border-avari-border bg-avari-input text-avari-text-primary text-sm focus:outline-none focus:border-avari-gold focus:ring-1 focus:ring-avari-gold transition-all cursor-pointer">
+                        <option value="newest" {{if eq .Sort "newest"}}selected{{end}}>Недавно добавленные</option>
+                        <option value="name" {{if eq .Sort "name"}}selected{{end}}>По названию</option>
+                        <option value="rating" {{if eq .Sort "rating"}}selected{{end}}>По моему рейтингу</option>
+                    </select>
+                    <svg class="w-4 h-4 text-avari-text-muted absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Submit button -->
+            <button type="submit"
+                    class="bg-avari-elevated hover:bg-avari-gold hover:text-avari-base border border-avari-border hover:border-avari-gold text-avari-text-primary px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
+                <span>Применить</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- Status Filter Tabs & Player Quick Filters -->
+    <div class="flex flex-col gap-3 mb-6">
+        <!-- Status Tabs -->
+        <nav aria-label="Collection status" class="flex flex-wrap gap-2 p-1.5 bg-avari-surface/60 rounded-2xl border border-avari-borderSubtle">
+            {{range .StatusLinks}}
+            <a href="{{.URL}}" hx-get="{{.URL}}" hx-target="#collection-content" hx-swap="outerHTML" hx-push-url="true"
+               {{if .Selected}}aria-current="page"{{end}}
+               class="flex-1 min-w-[110px] flex items-center justify-center py-2 px-3 rounded-xl text-xs tracking-wide transition-all duration-200 {{if .Selected}}bg-gradient-to-r from-avari-gold-light via-avari-gold to-avari-gold-dark text-avari-base font-semibold shadow-gold-sm{{else}}text-avari-text-secondary hover:text-avari-text-primary hover:bg-avari-elevated/70{{end}}">
+                {{.Label}}
+            </a>
+            {{end}}
+        </nav>
+
+        <!-- Signature Tabletop Player Count Quick Selector (Client-side interactive filter) -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs no-scrollbar">
+            <span class="text-[10px] font-mono text-avari-text-muted uppercase tracking-wider flex-shrink-0 mr-1">
+                👥 Состав игроков:
+            </span>
+            <button type="button" @click="playerFilter = 0"
+                    :class="playerFilter === 0 ? 'bg-avari-gold text-avari-base font-bold shadow-sm' : 'bg-avari-elevated/70 text-avari-text-secondary hover:text-avari-text-primary border border-avari-borderSubtle'"
+                    class="px-2.5 py-1 rounded-lg transition-colors flex-shrink-0 cursor-pointer">
+                Любой
+            </button>
+            <button type="button" @click="playerFilter = 1"
+                    :class="playerFilter === 1 ? 'bg-avari-gold text-avari-base font-bold shadow-sm' : 'bg-avari-elevated/70 text-avari-text-secondary hover:text-avari-text-primary border border-avari-borderSubtle'"
+                    class="px-2.5 py-1 rounded-lg transition-colors flex-shrink-0 cursor-pointer">
+                🗡 1 Соло
+            </button>
+            <button type="button" @click="playerFilter = 2"
+                    :class="playerFilter === 2 ? 'bg-avari-gold text-avari-base font-bold shadow-sm' : 'bg-avari-elevated/70 text-avari-text-secondary hover:text-avari-text-primary border border-avari-borderSubtle'"
+                    class="px-2.5 py-1 rounded-lg transition-colors flex-shrink-0 cursor-pointer">
+                ⚔️ 2 Дуэль
+            </button>
+            <button type="button" @click="playerFilter = 4"
+                    :class="playerFilter === 4 ? 'bg-avari-gold text-avari-base font-bold shadow-sm' : 'bg-avari-elevated/70 text-avari-text-secondary hover:text-avari-text-primary border border-avari-borderSubtle'"
+                    class="px-2.5 py-1 rounded-lg transition-colors flex-shrink-0 cursor-pointer">
+                🛡 3–4 Игрока
+            </button>
+            <button type="button" @click="playerFilter = 5"
+                    :class="playerFilter === 5 ? 'bg-avari-gold text-avari-base font-bold shadow-sm' : 'bg-avari-elevated/70 text-avari-text-secondary hover:text-avari-text-primary border border-avari-borderSubtle'"
+                    class="px-2.5 py-1 rounded-lg transition-colors flex-shrink-0 cursor-pointer">
+                🎉 5+ Патигейм
+            </button>
+        </div>
+    </div>
+
+    <!-- Games Container -->
+    <div id="game-list" aria-live="polite">
+        {{if .Error}}
+        <div role="alert" class="rounded-2xl bg-avari-rose/10 border border-avari-rose/30 text-avari-rose p-4 text-sm flex items-center gap-3 shadow-box-depth">
+            <span class="text-xl">⚠️</span>
+            <span>{{.Error}}</span>
+        </div>
+        {{else if not .Items}}
+        <div class="text-center py-16 px-4 bg-avari-surface/50 border border-avari-border/60 rounded-3xl shadow-box-depth">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-avari-elevated border border-avari-borderSubtle flex items-center justify-center text-3xl">
+                📭
+            </div>
+            {{if or .Query .FilterStatus}}
+            <h3 class="font-serif text-lg font-bold text-avari-text-primary mb-1">No games match these filters</h3>
+            <p class="text-xs sm:text-sm text-avari-text-muted mb-5">Попробуйте изменить поисковый запрос или категорию статуса.</p>
+            <a href="/collection" hx-get="/collection" hx-target="#collection-content" hx-swap="outerHTML" hx-push-url="true"
+               class="inline-flex items-center gap-1.5 text-xs font-mono text-avari-gold hover:text-avari-gold-light underline">
+                <span>Сбросить фильтры</span>
+            </a>
+            {{else}}
+            <h3 class="font-serif text-lg font-bold text-avari-text-primary mb-1">No games here yet</h3>
+            <p class="text-xs sm:text-sm text-avari-text-muted mb-6">Ваша настольная полка пуста. Найдите любимые игры и добавьте их в один клик.</p>
+            <a href="/games/search"
+               class="inline-flex items-center gap-2 bg-gradient-to-r from-avari-gold-light via-avari-gold to-avari-gold-dark text-avari-base px-5 py-2.5 rounded-xl text-xs font-semibold hover:shadow-gold-glow transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <span>Найти игры в BGG</span>
+            </a>
+            {{end}}
+        </div>
+        {{else}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{range .Items}}{{template "collection_card" .}}{{end}}
+        </div>
+        {{end}}
+    </div>
+</div>
+{{end}}

@@ -1,0 +1,22 @@
+{{define "add_button"}}
+{{if .InCollection}}
+<span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-avari-emerald/10 border border-avari-emerald/30 text-avari-emerald text-xs font-mono font-medium shadow-sm">
+    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+    </svg>
+    <span>✓ Added</span>
+</span>
+{{else}}
+<button
+    hx-post="/collection"
+    hx-vals='{"bgg_id": "{{.BGGID}}", "status": "owned"}'
+    hx-target="this"
+    hx-swap="outerHTML"
+    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-avari-gold-light via-avari-gold to-avari-gold-dark text-avari-base text-xs font-semibold hover:shadow-gold-sm hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer">
+    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+    </svg>
+    <span>+ Add</span>
+</button>
+{{end}}
+{{end}}

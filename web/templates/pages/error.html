@@ -1,0 +1,29 @@
+{{define "content"}}
+<div class="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-4 py-12 text-center relative">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-avari-rose/5 blur-[120px] rounded-full pointer-events-none"></div>
+
+    <div class="max-w-md w-full bg-avari-surface/90 backdrop-blur-md rounded-3xl border border-avari-border shadow-elven-modal p-8 relative z-10">
+        <div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-avari-elevated border border-avari-borderSubtle flex items-center justify-center text-4xl shadow-gold-sm">
+            {{if eq .Code 404}}🔍{{else if eq .Code 403}}🔒{{else}}⚠️{{end}}
+        </div>
+
+        <h1 class="font-serif text-4xl font-bold text-avari-text-primary mb-2 font-mono">
+            {{.Code}}
+        </h1>
+        <p class="text-sm text-avari-text-muted mb-8 leading-relaxed">
+            {{.Message}}
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+            <a href="javascript:history.back()"
+               class="flex-1 inline-flex items-center justify-center px-4 py-2.5 border border-avari-border bg-avari-elevated text-avari-text-secondary hover:text-avari-text-primary rounded-xl text-xs font-medium hover:bg-avari-surface transition-all">
+                ← Вернуться назад
+            </a>
+            <a href="/collection"
+               class="flex-1 inline-flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-avari-gold-light via-avari-gold to-avari-gold-dark text-avari-base rounded-xl text-xs font-semibold hover:shadow-gold-sm transition-all">
+                В коллекцию
+            </a>
+        </div>
+    </div>
+</div>
+{{end}}

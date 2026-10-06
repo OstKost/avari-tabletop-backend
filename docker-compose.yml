@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: tabletop
+      POSTGRES_PASSWORD: tabletop
+      POSTGRES_DB: tabletop
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tabletop"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgres://tabletop:tabletop@postgres:5432/tabletop?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+      PORT: "8080"
+      ENV: ${ENV:-development}
+      LLM_PROVIDER: ${LLM_PROVIDER:-ollama}
+      LLM_MODEL: ${LLM_MODEL:-qwen3.5}
+      LLM_BASE_URL: ${LLM_BASE_URL:-http://host.docker.internal:11434}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      CLAUDE_API_KEY: ${CLAUDE_API_KEY:-}
+      EMBED_PROVIDER: ${EMBED_PROVIDER:-ollama}
+      EMBED_MODEL: ${EMBED_MODEL:-nomic-embed-text}
+      EMBED_BASE_URL: ${EMBED_BASE_URL:-http://host.docker.internal:11434}
+      VECTOR_STORE: ${VECTOR_STORE:-chromem}
+      RULES_PERSIST_PATH: ${RULES_PERSIST_PATH:-./data/rules}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:

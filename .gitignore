@@ -1,0 +1,28 @@
+# Секреты и окружение
+.env
+.env.local
+.env.*.local
+*.env
+
+# Собранный бинарник
+/server
+/avari-tabletop-main
+/tabletop-ai-collection
+
+# Данные RAG (векторные индексы — пересоздаются)
+data/
+
+# Go
+*.test
+*.out
+/vendor/
+/dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+.claude
+.cache/

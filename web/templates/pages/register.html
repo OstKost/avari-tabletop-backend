@@ -1,0 +1,130 @@
+{{define "content"}}
+<div class="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-8 relative">
+    <!-- Ambient Glows -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[350px] bg-avari-gold/5 blur-[120px] rounded-full pointer-events-none"></div>
+
+    <div class="w-full max-w-4xl flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 relative z-10">
+        
+        <!-- Left Mascot Character (Ari) -->
+        <div class="hidden md:flex flex-col items-center max-w-xs text-center select-none">
+            <!-- Speech bubble -->
+            <div class="relative bg-avari-surface/90 border border-avari-borderGold/40 rounded-2xl p-4 shadow-elven-card mb-4 backdrop-blur-md">
+                <p class="text-xs text-avari-text-primary leading-relaxed">
+                    Добро пожаловать в Орден настольных хранителей! Создай учетную запись, чтобы упорядочить свои игры и правила.
+                </p>
+                <span class="block text-[10px] font-mono text-avari-gold mt-2 text-right">— Ари</span>
+                <!-- Bubble arrow -->
+                <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-avari-surface border-b border-r border-avari-borderGold/40 rotate-45"></div>
+            </div>
+            
+            <img src="/static/mascot_transparent.png" alt="Mascot Ari" class="w-56 h-auto drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] transition-transform duration-300 hover:scale-105">
+        </div>
+
+        <!-- Right Form Card -->
+        <div class="w-full max-w-md bg-avari-surface/90 backdrop-blur-md rounded-2xl border border-avari-border shadow-elven-modal p-6 sm:p-8">
+            <!-- Header with Logo -->
+            <div class="text-center mb-6">
+                <a href="/" class="inline-block mb-3">
+                    <img src="/static/logo.svg" alt="Avari Logo" class="w-12 h-12 mx-auto drop-shadow-[0_0_10px_rgba(217,185,110,0.35)]">
+                </a>
+                <h1 class="font-serif text-xl sm:text-2xl font-bold tracking-wider text-avari-text-primary uppercase">
+                    РЕГИСТРАЦИЯ
+                </h1>
+                <p class="text-[11px] font-mono text-avari-gold tracking-widest uppercase mt-1">
+                    Новый профиль хранителя
+                </p>
+                <span class="sr-only">Create account</span>
+            </div>
+
+            <!-- Error container for HTMX & SSR -->
+            <div id="form-errors">
+                {{if .Error}}
+                <div class="mb-5 p-3.5 bg-avari-rose/10 border border-avari-rose/40 rounded-xl text-avari-rose text-xs flex items-center gap-2.5">
+                    <span class="text-sm">⚠️</span>
+                    <span>{{.Error}}</span>
+                </div>
+                {{end}}
+            </div>
+
+            <form action="/register" method="POST"
+                  hx-post="/register"
+                  hx-target="#form-errors"
+                  x-data="{
+                    email: '{{.Email}}',
+                    username: '{{.Username}}',
+                    password: '',
+                    confirm: '',
+                    get pwMatch() { return this.password === this.confirm },
+                    get valid() {
+                      return this.email.includes('@') &&
+                             this.username.length >= 2 &&
+                             this.password.length >= 8 &&
+                             this.pwMatch
+                    }
+                  }">
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-[11px] font-mono tracking-wider text-avari-text-secondary uppercase mb-1.5" for="email">
+                            Email
+                        </label>
+                        <input id="email" name="email" type="email" autocomplete="email" required
+                               x-model="email"
+                               class="w-full px-4 py-2.5 rounded-xl border border-avari-border bg-avari-input text-avari-text-primary placeholder-avari-text-muted text-sm focus:outline-none focus:border-avari-gold focus:ring-1 focus:ring-avari-gold transition-all"
+                               placeholder="master@avari.dev">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-mono tracking-wider text-avari-text-secondary uppercase mb-1.5" for="username">
+                            Имя хранителя (Username)
+                        </label>
+                        <input id="username" name="username" type="text" autocomplete="username" required
+                               x-model="username" minlength="2" maxlength="50"
+                               class="w-full px-4 py-2.5 rounded-xl border border-avari-border bg-avari-input text-avari-text-primary placeholder-avari-text-muted text-sm focus:outline-none focus:border-avari-gold focus:ring-1 focus:ring-avari-gold transition-all"
+                               placeholder="Forve">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-mono tracking-wider text-avari-text-secondary uppercase mb-1.5" for="password">
+                            Пароль (мин. 8 символов)
+                        </label>
+                        <input id="password" name="password" type="password" autocomplete="new-password" required
+                               x-model="password"
+                               class="w-full px-4 py-2.5 rounded-xl border border-avari-border bg-avari-input text-avari-text-primary placeholder-avari-text-muted text-sm focus:outline-none focus:border-avari-gold focus:ring-1 focus:ring-avari-gold transition-all"
+                               placeholder="Min. 8 characters">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-mono tracking-wider text-avari-text-secondary uppercase mb-1.5" for="confirm_password">
+                            Подтверждение пароля
+                        </label>
+                        <input id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" required
+                               x-model="confirm"
+                               :class="confirm && !pwMatch ? 'border-avari-rose focus:ring-avari-rose' : 'border-avari-border focus:border-avari-gold focus:ring-avari-gold'"
+                               class="w-full px-4 py-2.5 rounded-xl border bg-avari-input text-avari-text-primary placeholder-avari-text-muted text-sm focus:outline-none focus:ring-1 transition-all"
+                               placeholder="••••••••">
+                        <p x-show="confirm && !pwMatch" class="text-avari-rose text-xs mt-1">Passwords don't match</p>
+                    </div>
+                </div>
+
+                <button type="submit"
+                        :disabled="!valid"
+                        :class="valid ? 'bg-gradient-to-r from-avari-gold-light via-avari-gold to-avari-gold-dark text-avari-base hover:shadow-gold-glow cursor-pointer' : 'bg-avari-elevated border border-avari-border text-avari-text-muted cursor-not-allowed opacity-60'"
+                        class="mt-6 w-full py-3 px-4 rounded-xl font-semibold transition-all duration-200 text-sm tracking-wide shadow-sm flex items-center justify-center gap-2">
+                    <span class="htmx-indicator animate-spin">⌛</span>
+                    <span>Создать аккаунт</span>
+                    <span class="sr-only">Create account</span>
+                </button>
+            </form>
+
+            <div class="mt-6 pt-5 border-t border-avari-borderSubtle text-center text-xs text-avari-text-muted">
+                <span>Уже есть аккаунт?</span>
+                <a href="/login" class="text-avari-gold hover:text-avari-gold-light font-medium ml-1 transition-colors underline">
+                    Войти
+                </a>
+                <span class="sr-only">Log in</span>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

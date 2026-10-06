@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="favGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F0D48D"/>
+      <stop offset="50%" stop-color="#D9B96E"/>
+      <stop offset="100%" stop-color="#A98A48"/>
+    </linearGradient>
+    <linearGradient id="favTeal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#144A5E"/>
+      <stop offset="100%" stop-color="#061820"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="24" fill="#06141B"/>
+  <rect width="98" height="98" x="1" y="1" rx="23" stroke="#1C3945" stroke-width="1.5" fill="none"/>
+  <g transform="translate(0, 2) scale(0.5)">
+    <!-- Left Arch -->
+    <path d="M100 22 C92 46, 68 85, 45 130 C34 152, 22 170, 14 182 C28 172, 44 158, 56 142 C72 120, 88 88, 98 48 Z" 
+          fill="url(#favTeal)" stroke="url(#favGold)" stroke-width="2.5"/>
+    <path d="M96 24 C82 60, 56 112, 20 178 C36 150, 62 98, 86 46 Z" fill="url(#favGold)"/>
+    <!-- Right Arch -->
+    <path d="M100 22 C108 46, 132 85, 155 130 C166 152, 178 170, 186 182 C172 172, 156 158, 144 142 C128 120, 112 88, 102 48 Z" 
+          fill="url(#favTeal)" stroke="url(#favGold)" stroke-width="2.5"/>
+    <path d="M104 24 C118 60, 144 112, 180 178 C164 150, 138 98, 114 46 Z" fill="url(#favGold)"/>
+    <!-- Top Crown -->
+    <path d="M100 22 C94 14, 82 8, 74 6 C84 12, 94 20, 100 28 C106 20, 116 12, 126 6 C118 8, 106 14, 100 22 Z" fill="#F0D48D"/>
+    <!-- Bridge -->
+    <path d="M62 135 C86 120, 114 120, 138 135 C122 144, 78 144, 62 135 Z" fill="url(#favTeal)" stroke="url(#favGold)" stroke-width="2"/>
+    <!-- Central d20 die -->
+    <g transform="translate(100, 108)">
+      <polygon points="0,-18 -15,-6 15,-6" fill="url(#favGold)" stroke="#FFF3D1" stroke-width="1.5"/>
+      <polygon points="-15,-6 15,-6 0,16" fill="url(#favTeal)" stroke="url(#favGold)" stroke-width="1.5"/>
+      <polygon points="0,-18 -18,-14 -15,-6" fill="url(#favTeal)" stroke="url(#favGold)" stroke-width="1"/>
+      <polygon points="0,-18 18,-14 15,-6" fill="url(#favGold)" stroke="url(#favGold)" stroke-width="1"/>
+      <polygon points="-18,-14 -20,6 -15,-6" fill="url(#favGold)" stroke="url(#favGold)" stroke-width="1"/>
+      <polygon points="18,-14 20,6 15,-6" fill="url(#favTeal)" stroke="url(#favGold)" stroke-width="1"/>
+      <polygon points="-20,6 0,16 -15,-6" fill="url(#favTeal)" stroke="url(#favGold)" stroke-width="1"/>
+      <polygon points="20,6 0,16 15,-6" fill="url(#favGold)" stroke="url(#favGold)" stroke-width="1"/>
+    </g>
+  </g>
+</svg>

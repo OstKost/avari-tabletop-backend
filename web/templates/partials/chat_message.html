@@ -1,0 +1,13 @@
+{{define "chat_message"}}
+{{if eq .Role "user"}}
+<div class="flex gap-3 justify-end items-start">
+    <div class="bg-avari-elevated/90 border border-avari-borderGold/40 text-avari-text-primary rounded-2xl rounded-tr-none px-4 py-3 shadow-elven-card max-w-sm sm:max-w-md md:max-w-xl text-xs sm:text-sm whitespace-pre-wrap leading-relaxed">{{.Content}}</div>
+    <div class="w-8 h-8 rounded-xl bg-gradient-to-r from-avari-gold-light to-avari-gold text-avari-base flex items-center justify-center text-xs font-bold flex-shrink-0 shadow-gold-sm">👤</div>
+</div>
+{{else}}
+<div class="flex gap-3 items-start">
+    <div class="w-8 h-8 rounded-xl bg-avari-surface border border-avari-borderGold/40 text-avari-gold flex items-center justify-center text-sm flex-shrink-0 shadow-gold-sm">🤖</div>
+    <div class="bg-avari-surface/95 border border-avari-border text-avari-text-primary rounded-2xl rounded-tl-none px-4 py-3 shadow-elven-card max-w-sm sm:max-w-md md:max-w-xl text-xs sm:text-sm whitespace-pre-wrap leading-relaxed">{{.Content}}</div>
+</div>
+{{end}}
+{{end}}

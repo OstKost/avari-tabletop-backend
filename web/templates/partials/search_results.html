@@ -1,0 +1,54 @@
+{{define "search_results"}}
+{{if .Error}}
+<div class="rounded-2xl bg-avari-rose/10 border border-avari-rose/30 text-avari-rose p-6 text-center text-sm shadow-elven-card flex items-center justify-center gap-3">
+    <span class="text-xl">⚠️</span>
+    <span>{{.Error}}</span>
+</div>
+{{else if and .Query (not .Results)}}
+<div class="text-center py-16 px-4 bg-avari-surface/50 border border-avari-border/60 rounded-2xl shadow-elven-card">
+    <div class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-avari-elevated border border-avari-borderSubtle flex items-center justify-center text-3xl">
+        🔍
+    </div>
+    <p class="font-serif text-base text-avari-text-primary mb-1">No games found for "<strong>{{.Query}}</strong>"</p>
+    <p class="text-xs text-avari-text-muted">Проверьте написание на английском языке или сократите поисковую фразу.</p>
+</div>
+{{else if .Results}}
+<div class="space-y-3">
+    {{range .Results}}
+    <div class="bg-avari-surface/90 backdrop-blur-md rounded-2xl border border-avari-border shadow-elven-card hover:border-avari-borderGold/40 transition-all duration-200 p-4 flex items-center justify-between gap-4 group">
+        <div class="flex items-center gap-3.5 min-w-0">
+            <div class="w-12 h-12 rounded-xl bg-avari-elevated border border-avari-borderSubtle flex items-center justify-center text-xl flex-shrink-0 group-hover:border-avari-gold/40 transition-colors">
+                🎲
+            </div>
+            <div class="min-w-0">
+                <a href="/games/{{.BGGID}}"
+                   class="font-serif font-bold text-avari-text-primary hover:text-avari-gold-light transition-colors text-sm sm:text-base leading-snug block truncate"
+                   title="{{.Name}}">
+                    {{.Name}}
+                </a>
+                <div class="flex items-center gap-2 mt-0.5">
+                    {{if .YearPublished}}
+                    <span class="text-[11px] font-mono text-avari-text-muted">{{.YearPublished}} г.</span>
+                    <span class="text-avari-border">•</span>
+                    {{end}}
+                    <span class="text-[10px] font-mono text-avari-gold">BGG #{{.BGGID}}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex-shrink-0">
+            {{template "add_button" .}}
+        </div>
+    </div>
+    {{end}}
+</div>
+{{else}}
+<div class="text-center py-16 px-4 bg-avari-surface/50 border border-avari-border/60 rounded-2xl shadow-elven-card">
+    <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-avari-elevated border border-avari-borderSubtle flex items-center justify-center text-3xl">
+        🎲
+    </div>
+    <p class="font-serif text-base text-avari-text-primary mb-1">Type a game name to search BoardGameGeek</p>
+    <p class="text-xs text-avari-text-muted">Начните вводить название настольной игры выше для поиска в каталоге.</p>
+</div>
+{{end}}
+{{end}}
